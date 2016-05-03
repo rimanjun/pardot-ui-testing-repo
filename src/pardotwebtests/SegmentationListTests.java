@@ -4,11 +4,8 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
-
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -17,6 +14,7 @@ import org.openqa.selenium.support.ui.Select;
 import org.testng.Assert;
 
 public class SegmentationListTests extends AbstractWebTests {
+	private String segmentationListName = null;
 
 	@Test
 	public void logIn() {
@@ -25,27 +23,47 @@ public class SegmentationListTests extends AbstractWebTests {
 
 	@Test
 	public void verifyDuplicateList() {
-		final String folderName = "EMAIL INTERVIEW TEST";
-		final String listPrefix = "ritu_list";
-		final String filterTextBoxId = "listx_table_filter";
+		final String listPrefix = "rm";
+		String filterTextBoxId = PardotConstantsUtil.ListPageElements.FILTERTEXTBOX_ID
+				.getElementRef();
 		String randomListName = randomStringGenerator(listPrefix);
+		segmentationListName = randomListName;
 
-		createList(webDriver, randomListName, folderName, null);
+		createList(webDriver, randomListName,
+				PardotDefaultTestProperties.ListDefaultInputs.FOLDERNAME
+						.getDataValue(),
+				null);
 		waitForClick();
 		assertEquals(randomListName + " - Pardot", webDriver.getTitle());
 
 		// create list with same name
-		createList(webDriver, randomListName, folderName, null);
+		createList(webDriver, randomListName,
+				PardotDefaultTestProperties.ListDefaultInputs.FOLDERNAME
+						.getDataValue(),
+				null);
 
 		// verify for error message at the top of the page
-		WebElement we = webDriver
-				.findElement(By.cssSelector(".alert.alert-error"));
-		String expectedErrorString = "Please correct the errors below and re-submit";
-		Assert.assertTrue(we.getText().equals(expectedErrorString),
+		String alertCss = "."
+				+ PardotConstantsUtil.ListPageElements.ALERT_CLASS1
+						.getElementRef()
+				+ "." + PardotConstantsUtil.ListPageElements.ALERT_CLASS2
+						.getElementRef();
+		WebElement we = webDriver.findElement(By.cssSelector(alertCss));
+		// String expectedErrorString = "Please correct the errors below and
+		// re-submit";
+		Assert.assertTrue(we.getText()
+				.equals(PardotConstantsUtil.ListPageElements.ERROR_MESSAGE_1
+						.getElementRef()),
 				"Expected error not found");
 
 		// cancel and return to list page
-		webDriver.findElement(By.cssSelector(".btn.btn-default")).click();
+		String cancelButtonCss = "."
+				+ PardotConstantsUtil.ListPageElements.CANCEL_BUTTON_CLASS1
+						.getElementRef()
+				+ "."
+				+ PardotConstantsUtil.ListPageElements.CANCEL_BUTTON_CLASS2
+						.getElementRef();
+		webDriver.findElement(By.cssSelector(cancelButtonCss)).click();
 
 		// rename original list
 
@@ -76,16 +94,20 @@ public class SegmentationListTests extends AbstractWebTests {
 		// edit name by appending suffix
 		webDriver.findElement(By.id("name")).sendKeys("_renamed");
 		waitForClick();
-		webDriver.findElement(By.id("save_information")).click();
-
+		webDriver.findElement(
+				By.id(PardotConstantsUtil.ListPageElements.SAVE_INFORMATION_BUTTON_ID
+						.getElementRef()))
+				.click();
 		assertEquals(randomListName + "_renamed - Pardot",
 				webDriver.getTitle());
 
 		waitForClick();
 		// create list with same name
-		createList(webDriver, randomListName, folderName, null);
+		createList(webDriver, randomListName,
+				PardotDefaultTestProperties.ListDefaultInputs.FOLDERNAME
+						.getDataValue(),
+				null);
 		assertEquals(randomListName + " - Pardot", webDriver.getTitle());
-
 	}
 
 	@Test
@@ -103,11 +125,18 @@ public class SegmentationListTests extends AbstractWebTests {
 		prospect.setFirstName(randomFirstName);
 		prospect.setLastName(randomlastName);
 		List<String> inputList = new ArrayList<String>();
-		inputList.add(PardotDefaultTestProperties.ProspectDefaultInputs.LIST
-				.getDataValue());
+		if (segmentationListName == null) {
+			inputList.add(PardotDefaultTestProperties.ProspectDefaultInputs.LIST
+					.getDataValue());
+		} else {
+			inputList.add(segmentationListName);
+		}
 		prospect.setSegmentationLists(inputList);
 		createProspect(webDriver, prospect);
 		verifyListInProspect(webDriver, prospect);
+		waitForClick();
+		webDriver.navigate().to(
+				PardotConstantsUtil.PardotPageUrls.PROSPECT.getPageUrlString());
 	}
 
 	@Test
@@ -130,20 +159,29 @@ public class SegmentationListTests extends AbstractWebTests {
 				defaultSenderType);
 
 	}
+
 	void createList(WebDriver webDriver, String listName, String folderName,
 			String tags) {
-		final String addListButtonId = "listxistx_link_create";
+		// final String addListButtonId = "listxistx_link_create";
 		// navigate to marketing,segmentation,list page
 		webDriver.navigate()
 				.to(PardotConstantsUtil.PardotPageUrls.LIST.getPageUrlString());
 		// click on create list button
-		webDriver.findElement(By.id(addListButtonId)).click();
+		webDriver.findElement(
+				By.id(PardotConstantsUtil.ListPageElements.ADDBUTTON_ID
+						.getElementRef()))
+				.click();
 		waitForClick();
 
 		// input data for list name and folder
-		webDriver.findElement(By.id("name")).sendKeys(listName);
+		webDriver.findElement(By.id(
+				PardotConstantsUtil.ListPageElements.NAME_ID.getElementRef()))
+				.sendKeys(listName);
 		// click on choose button adjacent to folder textbox
-		webDriver.findElement(By.className("icon-folder-open-alt")).click();
+		webDriver.findElement(By.className(
+				PardotConstantsUtil.ListPageElements.FOLDER_ICON_CLASS
+						.getElementRef()))
+				.click();
 		waitForClick();
 
 		// search filter
@@ -155,9 +193,17 @@ public class SegmentationListTests extends AbstractWebTests {
 
 		waitForClick();
 
-		// submit
-		webDriver.findElement(By.id("select-asset")).click();
-		webDriver.findElement(By.id("save_information")).click();
+		// finish choosing folder
+		webDriver.findElement(
+				By.id(PardotConstantsUtil.ListPageElements.CHOOSE_ASSET_BUTTON_ID
+						.getElementRef()))
+				.click();
+
+		// submit page
+		webDriver.findElement(
+				By.id(PardotConstantsUtil.ListPageElements.SAVE_INFORMATION_BUTTON_ID
+						.getElementRef()))
+				.click();
 	}
 
 	void createProspect(WebDriver webDriver, Prospect prospectObj) {
@@ -429,16 +475,19 @@ public class SegmentationListTests extends AbstractWebTests {
 
 		//click on send now button. Currently disabled.
 		//TODO update the ID mapped to SENDNOW button in PardotConstantsUtil.java
+		/*
 		webDriver.findElement(
 				By.id(PardotConstantsUtil.NewListEmailPageElements.SENDNOW_BUTTON_ID
 						.getElementRef()))
 				.click();
+		*/
 
 	}
 	
 
 	void verifyListInProspect(WebDriver webDriver, Prospect prospectObj) {
 		// assuming webDriver is already in the just created Prospect page
+		waitForClick();
 		waitForClick();
 		String navBarDisplayText = PardotConstantsUtil.PostCreateProspectPageElements.LIST_DISPLAYTEXT
 				.getElementRef();

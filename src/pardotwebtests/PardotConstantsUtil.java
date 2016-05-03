@@ -24,7 +24,18 @@ public final class PardotConstantsUtil {
 	
 	public enum ListPageElements
 	{
-		ADDBUTTONID("listxistx_link_create");
+		ADDBUTTON_ID("listxistx_link_create"),
+		FILTERTEXTBOX_ID("listx_table_filter"),
+		ERROR_MESSAGE_1("Please correct the errors below and re-submit"),
+		ALERT_CLASS1("alert"),
+		ALERT_CLASS2("alert-error"),
+		CANCEL_BUTTON_CLASS1("btn"),
+		CANCEL_BUTTON_CLASS2("btn-default"),
+		CHOOSE_ASSET_BUTTON_ID("select-asset"),
+		SAVE_INFORMATION_BUTTON_ID("save_information"),
+		FOLDER_ICON_CLASS("icon-folder-open-alt"),
+		NAME_ID("name")
+		;
 		
 		private final String elementRef;
 		ListPageElements(String elementRef)
