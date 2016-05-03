@@ -53,7 +53,10 @@ public final class PardotConstantsUtil {
 		CHOOSE_SELECTED_BUTTON_ID("select-asset"),
 		SAVE_BUTTON_ID("save_information"),
 		RADIO_EMAIL_TYPE_TEXT_ONLY_ID("email_type_text_only"),
-		FROM_TEMPLATE_ID("from_template");
+		FROM_TEMPLATE_ID("from_template"),
+		TEXT_MESSAGE_ID("text_message"),
+		SAVE_INFORMATION_BUTTON_ID("save_footer"),
+		SENDING_EMAIL_MENUBAR_DISPLAYTEXT("Sending");
 		
 		private final String elementRef;
 		NewListEmailPageElements(String elementRef)

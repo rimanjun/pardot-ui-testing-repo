@@ -21,7 +21,9 @@ public final class PardotDefaultTestProperties {
 	public enum EmailDefaultInputs
 	{
 		FOLDERNAME("EMAIL INTERVIEW TEST"),
-		CAMPAIGNNAME("Allison Tigers");
+		CAMPAIGNNAME("Allison Tigers"),
+		EMAIL_TEXT("Dear user, This is a test message."),
+		LISTNAME("adm");
 		
 		private final String dataValue;
 		EmailDefaultInputs(String dataValue)

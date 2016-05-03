@@ -11,6 +11,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.testng.Assert;
@@ -118,7 +119,7 @@ public class SegmentationListTests extends AbstractWebTests {
 						.getDataValue(),
 				PardotDefaultTestProperties.EmailDefaultInputs.CAMPAIGNNAME
 						.getDataValue(),
-				null);
+				null, PardotDefaultTestProperties.EmailDefaultInputs.EMAIL_TEXT.getDataValue());
 
 	}
 	void createList(WebDriver webDriver, String listName, String folderName,
@@ -263,7 +264,7 @@ public class SegmentationListTests extends AbstractWebTests {
 	 * 		optional tag
 	 */
 	void createNewEmail(WebDriver webDriver, String name, String folderName,
-			String campaignName, String tags) {
+			String campaignName, String tags, String message) {
 		// navigate to marketing,emails,new list email
 		webDriver.navigate().to(PardotConstantsUtil.PardotPageUrls.NEWLISTEMAIL
 				.getPageUrlString());
@@ -316,42 +317,26 @@ public class SegmentationListTests extends AbstractWebTests {
 				By.cssSelector(filterCssString));
 		searchBoxElement.sendKeys(campaignName);
 		//select the first item in the filtered list
-		/*
-		List<WebElement> campaignElementsList = webDriver
-				.findElements(By.cssSelector("."+PardotConstantsUtil.NewListEmailPageElements.FILTER_SEARCH_RESULTS_CLASS.getElementRef()));
-		*/
-		
 		waitForClick();
 		List<WebElement> campaignElementsList = webDriver
-				.findElements(By.cssSelector(".ember-list-container"));
-		campaignElementsList.get(0).click();
-		
-		/*
+				.findElements(By.cssSelector(".ember-list-container"));			
 		try {
 			
-			//campaignElementsList.get(0)
-					.findElement(By
-							.xpath(".//div[contains(@class,'folder-list-item') and contains(@class,ember-view') and contains(@class,'ember-list-item-view')]"))
-					.click();
-			
 			WebElement childElement = campaignElementsList.get(0)
-			.findElement(By.cssSelector(".ember-view.ember-list-item-view.folder-list-item"));
-			
-			
-			childElement.findElement(By.cssSelector(".media-body")).click();
+					.findElement(By
+							.xpath("//div/h4/i[@class='icon-bullhorn']"));
+			childElement.click();
 
-		} catch (ElementNotVisibleException e) {
+		} catch (WebDriverException e) {
+			System.out.println("not clickable. trying enter key");
 			searchBoxElement.sendKeys(Keys.RETURN);
-		}
-		*/
-		
-		// finish choosing the campaign
-		/*
+		}	
+		// finish choosing the campaign	
 		webDriver.findElement(
 				By.id(PardotConstantsUtil.NewListEmailPageElements.CHOOSE_SELECTED_BUTTON_ID
 						.getElementRef()))
 				.click();
-		*/
+		
 		//4 choose format as html only
 		webDriver.findElement(
 				By.id(PardotConstantsUtil.NewListEmailPageElements.RADIO_EMAIL_TYPE_TEXT_ONLY_ID
@@ -371,6 +356,41 @@ public class SegmentationListTests extends AbstractWebTests {
 				By.id(PardotConstantsUtil.NewListEmailPageElements.SAVE_BUTTON_ID
 						.getElementRef()))
 				.click();
+		
+		//expected to reach the next page to compose email
+		String existingText = webDriver.findElement(
+				By.id(PardotConstantsUtil.NewListEmailPageElements.TEXT_MESSAGE_ID
+						.getElementRef())).getText();
+		webDriver.findElement(
+				By.id(PardotConstantsUtil.NewListEmailPageElements.TEXT_MESSAGE_ID
+						.getElementRef())).clear();
+		String composingText = PardotDefaultTestProperties.EmailDefaultInputs.EMAIL_TEXT
+				.getDataValue() + existingText;
+		webDriver.findElement(
+				By.id(PardotConstantsUtil.NewListEmailPageElements.TEXT_MESSAGE_ID
+						.getElementRef())).sendKeys(
+						composingText);
+		webDriver.findElement(
+				By.id(PardotConstantsUtil.NewListEmailPageElements.SAVE_INFORMATION_BUTTON_ID
+						.getElementRef()))
+				.click();	
+		
+		// click on Sending menu item to navigate to sending page	
+		webDriver.findElement(By.id("flow_sending")).click();
+		
+		waitForClick();
+		webDriver.findElement(By.id("email-wizard-list-select")).click();
+		
+		/*
+		Select campaignDropdown = new Select(webDriver.findElement(
+				By.id(PardotConstantsUtil.ProspectPageElements.CAMPAIGN_ID
+						.getElementRef())));
+		campaignDropdown.selectByVisibleText(
+				PardotDefaultTestProperties.ProspectDefaultInputs.CAMPAIGN
+						.getDataValue());
+		*/
+		waitForClick();
+		
 	}
 	
 
