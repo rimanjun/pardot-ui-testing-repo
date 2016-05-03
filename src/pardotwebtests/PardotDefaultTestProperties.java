@@ -23,7 +23,9 @@ public final class PardotDefaultTestProperties {
 		FOLDERNAME("EMAIL INTERVIEW TEST"),
 		CAMPAIGNNAME("Allison Tigers"),
 		EMAIL_TEXT("Dear user, This is a test message."),
-		LISTNAME("adm");
+		SUBJECT_LINE("Hi"),
+		LISTNAME("adm"),
+		SENDER_TYPE("ACCOUNT OWNER");
 		
 		private final String dataValue;
 		EmailDefaultInputs(String dataValue)

@@ -114,12 +114,20 @@ public class SegmentationListTests extends AbstractWebTests {
 	public void sendNewEmailTest() {
 		String randomEmailName = randomStringGenerator("email_");
 
+		String defaultSenderType = "4";
 		createNewEmail(webDriver, randomEmailName,
 				PardotDefaultTestProperties.EmailDefaultInputs.FOLDERNAME
 						.getDataValue(),
 				PardotDefaultTestProperties.EmailDefaultInputs.CAMPAIGNNAME
 						.getDataValue(),
-				null, PardotDefaultTestProperties.EmailDefaultInputs.EMAIL_TEXT.getDataValue());
+				null,
+				PardotDefaultTestProperties.EmailDefaultInputs.EMAIL_TEXT
+						.getDataValue(),
+				PardotDefaultTestProperties.EmailDefaultInputs.LISTNAME
+						.getDataValue(),
+				PardotDefaultTestProperties.EmailDefaultInputs.SUBJECT_LINE
+						.getDataValue(),
+				defaultSenderType);
 
 	}
 	void createList(WebDriver webDriver, String listName, String folderName,
@@ -253,23 +261,31 @@ public class SegmentationListTests extends AbstractWebTests {
 	
 	/**
 	 * Create a new List Email without a template
+	 * 
 	 * @param webDriver
 	 * @param name
-	 * 		mandatory name for the email
+	 *            mandatory name for the email
 	 * @param folderName
-	 * 		name of an existing directory
+	 *            name of an existing directory
 	 * @param campaignName
-	 * 		name of an existing campaign
+	 *            name of an existing campaign
 	 * @param tags
-	 * 		optional tag
+	 *            optional tag
+	 * @param message
+	 *            email text format
+	 * @param listName
+	 *            name of existing segmentation list
+	 * @param subject
+	 *            line
 	 */
 	void createNewEmail(WebDriver webDriver, String name, String folderName,
-			String campaignName, String tags, String message) {
+			String campaignName, String tags, String message, String listName,
+			String subjectLine, String senderType) {
 		// navigate to marketing,emails,new list email
 		webDriver.navigate().to(PardotConstantsUtil.PardotPageUrls.NEWLISTEMAIL
 				.getPageUrlString());
 
-		//1 input data for email name which is mandatory
+		// 1 input data for email name which is mandatory
 		webDriver.findElement(
 				By.id(PardotConstantsUtil.NewListEmailPageElements.NAME_ID
 						.getElementRef()))
@@ -289,8 +305,8 @@ public class SegmentationListTests extends AbstractWebTests {
 						.getElementRef()))
 				.sendKeys(folderName);
 
-		List<WebElement> elementsList = webDriver.findElements(By.cssSelector("."+
-				PardotConstantsUtil.NewListEmailPageElements.FILTER_SEARCH_RESULTS_CLASS
+		List<WebElement> elementsList = webDriver.findElements(By.cssSelector(
+				"." + PardotConstantsUtil.NewListEmailPageElements.FILTER_SEARCH_RESULTS_CLASS
 						.getElementRef()));
 		elementsList.get(0).click();
 		waitForClick();
@@ -300,7 +316,7 @@ public class SegmentationListTests extends AbstractWebTests {
 						.getElementRef()))
 				.click();
 
-		//3 input data for campaign
+		// 3 input data for campaign
 		// click on choose button adjacent to campaign textbox
 		webDriver.findElement(By.className(
 				PardotConstantsUtil.NewListEmailPageElements.CAMPAIGN_ICON_CLASS
@@ -308,89 +324,116 @@ public class SegmentationListTests extends AbstractWebTests {
 				.click();
 		waitForClick();
 		// Go to select campaign page. search filter
-		String filterCssString="."+PardotConstantsUtil.NewListEmailPageElements.CAMPAIGN_SEARCH_FILTER_CLASS1.getElementRef()
-		+"."+PardotConstantsUtil.NewListEmailPageElements.CAMPAIGN_SEARCH_FILTER_CLASS2.getElementRef()
-		+"."+PardotConstantsUtil.NewListEmailPageElements.CAMPAIGN_SEARCH_FILTER_CLASS3
-		.getElementRef();
-		//input text in search bar
-		WebElement searchBoxElement = webDriver.findElement(
-				By.cssSelector(filterCssString));
+		String filterCssString = "."
+				+ PardotConstantsUtil.NewListEmailPageElements.CAMPAIGN_SEARCH_FILTER_CLASS1
+						.getElementRef()
+				+ "."
+				+ PardotConstantsUtil.NewListEmailPageElements.CAMPAIGN_SEARCH_FILTER_CLASS2
+						.getElementRef()
+				+ "."
+				+ PardotConstantsUtil.NewListEmailPageElements.CAMPAIGN_SEARCH_FILTER_CLASS3
+						.getElementRef();
+		// input text in search bar
+		WebElement searchBoxElement = webDriver
+				.findElement(By.cssSelector(filterCssString));
 		searchBoxElement.sendKeys(campaignName);
-		//select the first item in the filtered list
+		// select the first item in the filtered list
 		waitForClick();
 		List<WebElement> campaignElementsList = webDriver
-				.findElements(By.cssSelector(".ember-list-container"));			
+				.findElements(By.cssSelector(".ember-list-container"));
 		try {
-			
-			WebElement childElement = campaignElementsList.get(0)
-					.findElement(By
-							.xpath("//div/h4/i[@class='icon-bullhorn']"));
+
+			WebElement childElement = campaignElementsList.get(0).findElement(
+					By.xpath("//div/h4/i[@class='icon-bullhorn']"));
 			childElement.click();
 
 		} catch (WebDriverException e) {
 			System.out.println("not clickable. trying enter key");
 			searchBoxElement.sendKeys(Keys.RETURN);
-		}	
-		// finish choosing the campaign	
+		}
+		// finish choosing the campaign
 		webDriver.findElement(
 				By.id(PardotConstantsUtil.NewListEmailPageElements.CHOOSE_SELECTED_BUTTON_ID
 						.getElementRef()))
 				.click();
-		
-		//4 choose format as html only
+
+		// 4 choose format as html only
 		webDriver.findElement(
 				By.id(PardotConstantsUtil.NewListEmailPageElements.RADIO_EMAIL_TYPE_TEXT_ONLY_ID
 						.getElementRef()))
 				.click();
-		
-		//5 uncheck template checkbox
+
+		// 5 uncheck template checkbox
 		webDriver.findElement(
 				By.id(PardotConstantsUtil.NewListEmailPageElements.FROM_TEMPLATE_ID
 						.getElementRef()))
 				.click();
-		
-		//TODO add code to input other non-mandatory field data
-			
+
+		// TODO add code to input other non-mandatory field data
+
+		waitForClick();
 		// finish saving info on page1
 		webDriver.findElement(
 				By.id(PardotConstantsUtil.NewListEmailPageElements.SAVE_BUTTON_ID
 						.getElementRef()))
 				.click();
-		
-		//expected to reach the next page to compose email
+
+		// expected to reach the next page to compose email
 		String existingText = webDriver.findElement(
 				By.id(PardotConstantsUtil.NewListEmailPageElements.TEXT_MESSAGE_ID
-						.getElementRef())).getText();
+						.getElementRef()))
+				.getText();
 		webDriver.findElement(
 				By.id(PardotConstantsUtil.NewListEmailPageElements.TEXT_MESSAGE_ID
-						.getElementRef())).clear();
-		String composingText = PardotDefaultTestProperties.EmailDefaultInputs.EMAIL_TEXT
-				.getDataValue() + existingText;
+						.getElementRef()))
+				.clear();
+		String composingText = message + existingText;
 		webDriver.findElement(
 				By.id(PardotConstantsUtil.NewListEmailPageElements.TEXT_MESSAGE_ID
-						.getElementRef())).sendKeys(
-						composingText);
+						.getElementRef()))
+				.sendKeys(composingText);
+
+		waitForClick();
 		webDriver.findElement(
 				By.id(PardotConstantsUtil.NewListEmailPageElements.SAVE_INFORMATION_BUTTON_ID
 						.getElementRef()))
-				.click();	
-		
-		// click on Sending menu item to navigate to sending page	
+				.click();
+
+		// click on Sending menu item to navigate to sending page
 		webDriver.findElement(By.id("flow_sending")).click();
-		
+
+		// select atleast 1 list
 		waitForClick();
-		webDriver.findElement(By.id("email-wizard-list-select")).click();
-		
+		WebElement listElement = webDriver
+				.findElement(By.id("email-wizard-list-select"));
+		listElement.click();
 		/*
-		Select campaignDropdown = new Select(webDriver.findElement(
-				By.id(PardotConstantsUtil.ProspectPageElements.CAMPAIGN_ID
-						.getElementRef())));
-		campaignDropdown.selectByVisibleText(
-				PardotDefaultTestProperties.ProspectDefaultInputs.CAMPAIGN
-						.getDataValue());
-		*/
+		 * TODO - not working currently WebElement webElement =
+		 * listElement.findElement(By.cssSelector(".chzn-search")); Select
+		 * listDropdown = new Select(webElement);
+		 * listDropdown.selectByVisibleText(listName);
+		 */
+
+		// select sender type as account owner
+		WebElement senderElement = webDriver.findElement(By.name("a_sender[]"));
+		Select senderDropdown = new Select(senderElement);
+		senderDropdown.selectByValue(senderType);
 		waitForClick();
 		
+		//input subject line
+		webDriver.findElement(
+				By.id(PardotConstantsUtil.NewListEmailPageElements.SUBJECTLINE_ID
+						.getElementRef()))
+				.sendKeys(subjectLine);
+		waitForClick();
+
+		//click on send now button. Currently disabled.
+		//TODO update the ID mapped to SENDNOW button in PardotConstantsUtil.java
+		webDriver.findElement(
+				By.id(PardotConstantsUtil.NewListEmailPageElements.SENDNOW_BUTTON_ID
+						.getElementRef()))
+				.click();
+
 	}
 	
 

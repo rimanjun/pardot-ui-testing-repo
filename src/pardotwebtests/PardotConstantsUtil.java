@@ -56,7 +56,10 @@ public final class PardotConstantsUtil {
 		FROM_TEMPLATE_ID("from_template"),
 		TEXT_MESSAGE_ID("text_message"),
 		SAVE_INFORMATION_BUTTON_ID("save_footer"),
-		SENDING_EMAIL_MENUBAR_DISPLAYTEXT("Sending");
+		SENDING_EMAIL_MENUBAR_DISPLAYTEXT("Sending"),
+		SENDER_DROPDOWN_SELECT_NAME("a_sender[]"),
+		SUBJECTLINE_ID("subject_a"),
+		SENDNOW_BUTTON_ID("");
 		
 		private final String elementRef;
 		NewListEmailPageElements(String elementRef)
